@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  laravel.local:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    container_name: laravel.local
+    environment:
+      VIRTUAL_HOST: laravel.local
+    volumes:
+      - ./app:/www/app
+    cap_add:
+      - SYS_PTRACE
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
