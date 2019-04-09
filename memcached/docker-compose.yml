@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  memcached.local:
+    image: memcached:alpine
+    restart: always
+    container_name: memcached.local
+    environment:
+      VIRTUAL_HOST: memcached.local
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

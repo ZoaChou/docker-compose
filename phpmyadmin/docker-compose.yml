@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  phpmyadmin.local:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    container_name: phpmyadmin.local
+    environment:
+      VIRTUAL_HOST: phpmyadmin.local
+      PMA_ARBITRARY: 1
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

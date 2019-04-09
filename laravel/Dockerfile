@@ -22,8 +22,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && docker-php-ext-enable tideways_xhprof \
     && pecl install mongodb \
     && docker-php-ext-enable mongodb \
-    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apk del tzdata
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 
 COPY ./nginx/conf.d/ /etc/nginx/conf.d/
@@ -48,6 +47,28 @@ RUN apk add --no-cache --virtual .build-deps \
     && apk del -f .build-deps \
     && composer config -g repo.packagist composer https://packagist.laravel-china.org \
     && composer global require laravel/laravel -vvv
+
+# Install PHP Extensions (igbinary & memcached)
+RUN apk add --no-cache --update libmemcached-libs zlib
+RUN set -xe && \
+    cd /tmp/ && \
+    apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS && \
+    apk add --no-cache --update --virtual .memcached-deps zlib-dev libmemcached-dev cyrus-sasl-dev && \
+    pecl install igbinary && \
+    ( \
+        pecl install --nobuild memcached && \
+        cd "$(pecl config-get temp_dir)/memcached" && \
+        phpize && \
+        ./configure --enable-memcached-igbinary && \
+        make -j$(nproc) && \
+        make install && \
+        cd /tmp/ \
+    ) && \
+    docker-php-ext-enable igbinary memcached && \
+    rm -rf /tmp/* && \
+    apk del .memcached-deps .phpize-deps
+
+RUN docker-php-ext-install bcmath
 
 VOLUME /www/app
 WORKDIR /www/app

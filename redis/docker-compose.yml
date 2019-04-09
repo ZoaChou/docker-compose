@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  redis.local:
+    image: redis:alpine
+    restart: always
+    container_name: redis.local
+    environment:
+      VIRTUAL_HOST: redis.local
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
